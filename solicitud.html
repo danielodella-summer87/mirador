@@ -1,0 +1,24 @@
+<!doctype html><html lang="es-UY"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Solicitar visita · Mirador de las Sierras</title><link rel="stylesheet" href="sitio.css"></head><body class="gestion"><main><img class="marca-form" src="assets/logo.svg" alt="Mirador de las Sierras"><p class="antetitulo">VISITA GUIADA</p><h1>Vení a conocer el campo.</h1><p>Probá el formulario con los datos ficticios de ejemplo. La visita es simulada.</p><p id="referencia"></p><form><label>Tu nombre<input name="nombre" value="Sofía Méndez" autocomplete="name" minlength="2" maxlength="90" required></label><label>Celular con código de país<input name="celular" type="tel" value="+598 0000 0000" autocomplete="tel" placeholder="+598…" maxlength="28" required></label><label class="check"><input name="permiso" type="checkbox" required> Quiero probar la solicitud de visita.</label><button>Simular solicitud</button></form><p id="resultado" role="status"></p></main>
+<script>
+const params=new URLSearchParams(location.search);
+const lote=Number(params.get('parcela')||0);
+const parcela=Number.isInteger(lote)&&lote>0&&lote<=117?lote:0;
+const interes=(params.get('interes')||'').slice(0,180);
+const origen=(params.get('origen')||'Web').slice(0,80);
+document.querySelector('#referencia').textContent=[parcela?'Parcela '+parcela:'',interes].filter(Boolean).join(' · ');
+const form=document.querySelector('form');
+const salida=document.querySelector('#resultado');
+const bytes=crypto.getRandomValues(new Uint8Array(16));
+bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+const id=[hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-');
+form.onsubmit=async e=>{
+ e.preventDefault();
+ const nombre=form.elements.nombre.value.trim(),celular=form.elements.celular.value.trim();
+ if(nombre.length<2||!/^\+?[\d ()-]+$/.test(celular)||!/^\d{7,15}$/.test(celular.replace(/\D/g,''))){salida.textContent='Revisá el nombre y el número de celular.';return}
+ form.hidden=true;
+ salida.textContent='Solicitud simulada. En el copiloto podés probar cómo Ricardo recibe una consulta del hotel.';
+ const link=document.createElement('a');
+ link.href='copiloto.html';link.textContent=' Abrir el copiloto de Ricardo →';salida.append(link);
+};
+</script></body></html>
